@@ -4,7 +4,9 @@
 void Usage() {
 	std::cout << "Monitor.exe -- prints the usage information" << std::endl;
 	std::cout << "Monitor.exe /show -- prints current brightness and contrast for every monitor detected" << std::endl;
-	std::cout << "Monitor.exe /set 1 60 -- sets both brightness and contrast to 60 of monitor with id 1" << std::endl;
+	std::cout << "Monitor.exe /set 1 60 -- sets both brightness and contrast to 60% of monitor with id 1" << std::endl;
+	std::cout << "Monitor.exe /brighter 1 -- increases the brightness and contrast to +10% of monitor with id 1" << std::endl;
+	std::cout << "Monitor.exe /darker 1 -- decreases the brightness and contrast to -10% of monitor with id 1" << std::endl;
 }
 
 void Show() {
@@ -32,6 +34,40 @@ bool Set(int monitorId, int intensity) {
 	return true;
 }
 
+bool Brighter(int monitorId) {
+	auto monitors = EnumerateMonitors();
+	if (monitors.empty()) {
+		std::cout << "No monitors found." << std::endl;
+		return false;
+	}
+	if (monitorId >= monitors.size() || monitorId < 0) {
+		std::cerr << "Monitor with id " << monitorId << " not found" << std::endl;
+		return false;
+	}
+	const int currentIntensity = monitors[monitorId].currentBrightness();
+	const int newIntensity = min(currentIntensity + 10, 100);
+	monitors[monitorId].setCurrentBrightness(newIntensity);
+	monitors[monitorId].setCurrentContrast(newIntensity);
+	return true;
+}
+
+bool Darker(int monitorId) {
+	auto monitors = EnumerateMonitors();
+	if (monitors.empty()) {
+		std::cout << "No monitors found." << std::endl;
+		return false;
+	}
+	if (monitorId >= monitors.size() || monitorId < 0) {
+		std::cerr << "Monitor with id " << monitorId << " not found" << std::endl;
+		return false;
+	}
+	const int currentIntensity = monitors[monitorId].currentBrightness();
+	const int newIntensity = max(currentIntensity - 10, 0);
+	monitors[monitorId].setCurrentBrightness(newIntensity);
+	monitors[monitorId].setCurrentContrast(newIntensity);
+	return true;
+}
+
 int main(int argc, char ** argv) {
 	if (argc == 1) {
 		Usage();
@@ -40,6 +76,20 @@ int main(int argc, char ** argv) {
 	
 	if (argc == 2 && std::string("/show") == std::string(argv[1])) {
 		Show();
+		return 0;
+	}
+
+	if (argc == 3 && std::string("/brighter") == std::string(argv[1])) {
+		int monitorId = std::atoi(argv[2]);
+		if (!Brighter(monitorId))
+			return 1;
+		return 0;
+	}
+
+	if (argc == 3 && std::string("/darker") == std::string(argv[1])) {
+		int monitorId = std::atoi(argv[2]);
+		if (!Darker(monitorId))
+			return 1;
 		return 0;
 	}
 
