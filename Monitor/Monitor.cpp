@@ -93,20 +93,25 @@ int Monitor::currentContrast() const
     return -1;
 }
 
-void Monitor::setCurrentBrightness(int b)
+bool Monitor::setCurrentBrightness(int b)
 {
     if (!mBrightnessSupported)
-        return;
+        return false;
 
-    SetMonitorBrightness(mPhysicalMonitor.hPhysicalMonitor, b);
+    return SetMonitorBrightness(mPhysicalMonitor.hPhysicalMonitor, b);
 }
 
-void Monitor::setCurrentContrast(int b)
+bool Monitor::setCurrentContrast(int b)
 {
     if (!mContrastSupported)
-        return;
+        return false;
 
-    SetMonitorContrast(mPhysicalMonitor.hPhysicalMonitor, b);
+    // The constrast setting Win32 API gives unstable results - often it is no-op even though true is returned.
+    // Run setCurrentContrast() twice to lower the risk of unexpected behavior for the end user.
+    bool firstResult = SetMonitorContrast(mPhysicalMonitor.hPhysicalMonitor, b);
+    Sleep(20);
+    bool secondResult = SetMonitorContrast(mPhysicalMonitor.hPhysicalMonitor, b);
+    return firstResult || secondResult;
 }
 
 void Monitor::setCurrentBrightnessFraction(double fraction)

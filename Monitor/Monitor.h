@@ -19,14 +19,14 @@ public:
     int maximumBrightness() const;
     int currentBrightness() const;
 
-    void setCurrentBrightness(int b);
+    bool setCurrentBrightness(int b);
     // Set brightness from 0.0-1.0
     void setCurrentBrightnessFraction(double fraction);
 
 
     int currentContrast() const;
 
-    void setCurrentContrast(int b);
+    bool setCurrentContrast(int b);
 private:
     bool mBrightnessSupported = false;
     int mMinimumBrightness = 0;

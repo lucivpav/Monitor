@@ -34,7 +34,7 @@ bool Set(int monitorId, int intensity) {
 	return true;
 }
 
-bool Brighter(int monitorId) {
+bool BrighterOrDarker(int monitorId, bool brighter) {
 	auto monitors = EnumerateMonitors();
 	if (monitors.empty()) {
 		std::cout << "No monitors found." << std::endl;
@@ -45,27 +45,27 @@ bool Brighter(int monitorId) {
 		return false;
 	}
 	const int currentIntensity = monitors[monitorId].currentBrightness();
-	const int newIntensity = min(currentIntensity + 10, 100);
-	monitors[monitorId].setCurrentBrightness(newIntensity);
-	monitors[monitorId].setCurrentContrast(newIntensity);
-	return true;
+	const int newIntensity = brighter ? min(currentIntensity + 10, 100) : max(currentIntensity - 10, 0);
+
+	bool result = true;
+	if (!monitors[monitorId].setCurrentBrightness(newIntensity)) {
+		std::cerr << "Error setting brightness for monitor " << monitorId << std::endl;
+		result = false;
+	}
+
+	if (!monitors[monitorId].setCurrentContrast(newIntensity)) {
+		std::cerr << "Error setting contrast for monitor " << monitorId << std::endl;
+		result = false;
+	}
+	return result;
+}
+
+bool Brighter(int monitorId) {
+	return BrighterOrDarker(monitorId, true);
 }
 
 bool Darker(int monitorId) {
-	auto monitors = EnumerateMonitors();
-	if (monitors.empty()) {
-		std::cout << "No monitors found." << std::endl;
-		return false;
-	}
-	if (monitorId >= monitors.size() || monitorId < 0) {
-		std::cerr << "Monitor with id " << monitorId << " not found" << std::endl;
-		return false;
-	}
-	const int currentIntensity = monitors[monitorId].currentBrightness();
-	const int newIntensity = max(currentIntensity - 10, 0);
-	monitors[monitorId].setCurrentBrightness(newIntensity);
-	monitors[monitorId].setCurrentContrast(newIntensity);
-	return true;
+	return BrighterOrDarker(monitorId, false);
 }
 
 int main(int argc, char ** argv) {
