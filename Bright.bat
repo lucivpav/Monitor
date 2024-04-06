@@ -1,1 +1,1 @@
-x64\Release\Monitor.exe /set 1 80
+x64\Release\Monitor.exe /set 80

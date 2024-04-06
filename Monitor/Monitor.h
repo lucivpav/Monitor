@@ -5,8 +5,6 @@
 #include <physicalmonitorenumerationapi.h>
 #include <highlevelmonitorconfigurationapi.h>
 
-#include <vector>
-
 class Monitor
 {
 public:
@@ -40,5 +38,3 @@ private:
 
     PHYSICAL_MONITOR mPhysicalMonitor;
 };
-
-std::vector<Monitor> EnumerateMonitors();

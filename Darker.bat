@@ -1,1 +1,1 @@
-x64\Release\Monitor.exe /darker 1
+x64\Release\Monitor.exe /darker
